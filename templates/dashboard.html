@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<h2 class="text-center mb-4">Dashboard</h2>
+
+{% if last_value %}
+<p class="text-center">
+    Last temperature: <strong>{{ last_value.temperature }}Degrees</strong> ({{ last_value.timestamp }})
+</p>
+{% else %}
+<p class="text-center">No data</p>
+{% endif %}
+
+<form method="GET" action="{{ url_for('dashboard') }}" class="text-center mb-4">
+    <label for="num">Number of records shown:</label>
+    <input type="number" name="num" min="1" max="{{ total_records if total_records else 1 }}" value="{{ num_values }}" class="form-control d-inline-block w-auto">
+    <button type="submit" class="btn btn-primary ms-2">Apply</button>
+</form>
+
+<!-- ROW: graph and table -->
+<div class="row">
+    <p class="text-muted text-center">Graph data: {{ data|length }} entries</p>
+
+    <!-- graph -->
+    <div class="col-md-6" style="height: 350px;">
+    <canvas id="tempChart"></canvas>
+</div>
+
+    <!-- table -->
+    <div class="col-md-6">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Temperature</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in data %}
+                <tr>
+                    <td>{{ entry.id + 1 }}</td>
+                    <td>{{ entry.temperature }}Degrees</td>
+                    <td>{{ entry.timestamp }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- delete button -->
+<div class="text-center mt-4 mb-5">
+    <form method="POST" action="{{ url_for('delete_oldest') }}">
+        <button type="submit" class="btn btn-danger px-4 py-2">Delete oldest record</button>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const canvas = document.getElementById("tempChart");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ data|map(attribute='timestamp')|list|tojson }},
+            datasets: [{
+                label: 'Temperature',
+                data: {{ data|map(attribute='temperature')|list|tojson }},
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    title: { display: true, text: 'Time' }
+                },
+                y: {
+                    title: { display: true, text: 'Temperature (C)' }
+                }
+            }
+        }
+    });
+});
+</script>
+
+<style>
+    #tempChart {
+        width: 100%;
+        display: block;
+    }
+</style>
+
+
+{% endblock %}
