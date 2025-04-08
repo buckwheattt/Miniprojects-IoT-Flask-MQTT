@@ -59,7 +59,7 @@ DATA=[
 print(f"Current umber of DATA lines: {len(DATA)}")
 @app.route("/")
 def dashboard():
-    num_values = request.args.get("num", session.get("num", 50), type=int) 
+    num_values = request.args.get("num", session.get("num", 15), type=int) 
 
     num_values = max(1, min(num_values, len(DATA)))
 
