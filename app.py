@@ -1,94 +1,103 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, render_template, request, redirect, url_for, session
-
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from models import db, User, Data
+from api_routes import api_bp
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
-DATA=[
-    {"id": 0,"temperature": 21,"timestamp": "2025-01-01 01:00:00"},
-    {"id": 1,"temperature": 33,"timestamp": "2025-01-01 01:05:52"},
-    {"id": 2,"temperature": 38,"timestamp": "2025-01-01 01:10:23"},
-    {"id": 3,"temperature": 21,"timestamp": "2025-01-01 01:15:17"},
-    {"id": 4,"temperature": 24,"timestamp": "2025-01-01 01:20:08"},
-    {"id": 5,"temperature": 35,"timestamp": "2025-01-01 01:25:42"},
-    {"id": 6,"temperature": 40,"timestamp": "2025-01-01 01:30:00"},
-    {"id": 7,"temperature": 37,"timestamp": "2025-01-01 01:35:19"},
-    {"id": 8,"temperature": 37,"timestamp": "2025-01-01 01:40:25"},
-    {"id": 9,"temperature": 20,"timestamp": "2025-01-01 01:45:53"},
-    {"id": 10,"temperature": 35,"timestamp": "2025-01-01 01:50:15"},
-    {"id": 11,"temperature": 34,"timestamp": "2025-01-01 01:55:19"},
-    {"id": 12,"temperature": 28,"timestamp": "2025-01-01 02:00:46"},
-    {"id": 13,"temperature": 23,"timestamp": "2025-01-01 02:05:55"},
-    {"id": 14,"temperature": 25,"timestamp": "2025-01-01 02:10:20"},
-    {"id": 15,"temperature": 23,"timestamp": "2025-01-01 02:15:43"},
-    {"id": 16,"temperature": 23,"timestamp": "2025-01-01 02:20:52"},
-    {"id": 17,"temperature": 31,"timestamp": "2025-01-01 02:25:47"},
-    {"id": 18,"temperature": 29,"timestamp": "2025-01-01 02:30:35"},
-    {"id": 19,"temperature": 31,"timestamp": "2025-01-01 02:35:52"},
-    {"id": 20,"temperature": 35,"timestamp": "2025-01-01 02:40:28"},
-    {"id": 21,"temperature": 26,"timestamp": "2025-01-01 02:45:53"},
-    {"id": 22,"temperature": 35,"timestamp": "2025-01-01 02:50:50"},
-    {"id": 23,"temperature": 28,"timestamp": "2025-01-01 02:55:56"},
-    {"id": 24,"temperature": 39,"timestamp": "2025-01-01 03:00:31"},
-    {"id": 25,"temperature": 36,"timestamp": "2025-01-01 03:05:56"},
-    {"id": 26,"temperature": 39,"timestamp": "2025-01-01 03:10:40"},
-    {"id": 27,"temperature": 23,"timestamp": "2025-01-01 03:15:47"},
-    {"id": 28,"temperature": 31,"timestamp": "2025-01-01 03:20:11"},
-    {"id": 29,"temperature": 21,"timestamp": "2025-01-01 03:25:43"},
-    {"id": 30,"temperature": 23,"timestamp": "2025-01-01 03:30:58"},
-    {"id": 32,"temperature": 28,"timestamp": "2025-01-01 03:35:51"},
-    {"id": 31,"temperature": 29,"timestamp": "2025-01-01 03:40:46"},
-    {"id": 33,"temperature": 31,"timestamp": "2025-01-01 03:45:38"},
-    {"id": 34,"temperature": 40,"timestamp": "2025-01-01 03:50:09"},
-    {"id": 35,"temperature": 37,"timestamp": "2025-01-01 03:55:26"},
-    {"id": 36,"temperature": 32,"timestamp": "2025-01-01 04:00:25"},
-    {"id": 37,"temperature": 39,"timestamp": "2025-01-01 04:05:03"},
-    {"id": 38,"temperature": 31,"timestamp": "2025-01-01 04:10:39"},
-    {"id": 39,"temperature": 31,"timestamp": "2025-01-01 04:15:16"},
-    {"id": 40,"temperature": 32,"timestamp": "2025-01-01 04:20:14"},
-    {"id": 41,"temperature": 33,"timestamp": "2025-01-01 04:25:03"},
-    {"id": 42,"temperature": 21,"timestamp": "2025-01-01 04:30:01"},
-    {"id": 43,"temperature": 34,"timestamp": "2025-01-01 04:35:24"},
-    {"id": 44,"temperature": 39,"timestamp": "2025-01-01 04:40:10"},
-    {"id": 45,"temperature": 36,"timestamp": "2025-01-01 04:45:47"},
-    {"id": 46,"temperature": 40,"timestamp": "2025-01-01 04:50:18"},
-    {"id": 47,"temperature": 27,"timestamp": "2025-01-01 04:55:35"},
-    {"id": 48,"temperature": 37,"timestamp": "2025-01-01 05:00:11"},
-    {"id": 49,"temperature": 38,"timestamp": "2025-01-01 05:05:45"}
-]
-print(f"Current umber of DATA lines: {len(DATA)}")
+
+# Настройка базы данных
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
+
+# Login manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+# API blueprint
+app.register_blueprint(api_bp, url_prefix="/api")
+
+# Создание таблиц при первом запуске
+with app.app_context():
+    db.create_all()
+
+# User loader
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# ============ ROUTES ============
+
 @app.route("/")
+@login_required
 def dashboard():
-    num_values = request.args.get("num", session.get("num", 50), type=int) 
+    num_values = request.args.get("num", session.get("num", 15), type=int)
+    sort = request.args.get("sort", session.get("sort", "desc"))
 
-    num_values = max(1, min(num_values, len(DATA)))
-
+    num_values = max(1, min(num_values, Data.query.count()))
     session["num"] = num_values
+    session["sort"] = sort
 
-    print(f"DEBUG: num_values={num_values}, total DATA={len(DATA)}")
+    order = Data.timestamp.desc() if sort == "desc" else Data.timestamp.asc()
+    data = Data.query.order_by(order).limit(num_values).all()
+    last_value = data[-1] if sort == "asc" else data[0] if data else None
 
-    last_value = DATA[-1] if DATA else None
-    return render_template("dashboard.html", 
-                           data=list(reversed(DATA[-num_values:])), 
-                           last_value=last_value, 
-                           total_records=len(DATA),
-                           num_values=num_values)  
+    return render_template("dashboard.html",
+                           data=data,
+                           last_value=last_value,
+                           total_records=Data.query.count(),
+                           num_values=num_values,
+                           sort=sort)
 
 @app.route("/delete_oldest", methods=["POST"])
+@login_required
 def delete_oldest():
-    global DATA
-    if DATA:
-        DATA.pop(0)
+    oldest = Data.query.order_by(Data.timestamp.asc()).first()
+    if oldest:
+        db.session.delete(oldest)
+        db.session.commit()
     return redirect(url_for("dashboard"))
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password_hash, password):
+            login_user(user)
+            return redirect(url_for("dashboard"))
+        return "Invalid credentials", 401
     return render_template("login.html")
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        if User.query.filter_by(username=username).first():
+            return "Username already exists", 400
+
+        hashed_pw = generate_password_hash(password)
+        new_user = User(username=username, password_hash=hashed_pw)
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for("login"))
     return render_template("register.html")
 
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
+
+# ============ START ============
 if __name__ == "__main__":
     app.run(debug=True)
-

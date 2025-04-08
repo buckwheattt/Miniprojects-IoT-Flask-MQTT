@@ -6,7 +6,7 @@
 
 {% if last_value %}
 <p class="text-center">
-    Last temperature: <strong>{{ last_value.temperature }}Degrees</strong> ({{ last_value.timestamp }})
+    Last temperature: <strong>{{ last_value.temperature }} Degrees</strong> ({{ last_value.timestamp }})
 </p>
 {% else %}
 <p class="text-center">No data</p>
@@ -14,18 +14,24 @@
 
 <form method="GET" action="{{ url_for('dashboard') }}" class="text-center mb-4">
     <label for="num">Number of records shown:</label>
-    <input type="number" name="num" min="1" max="{{ total_records if total_records else 1 }}" value="{{ num_values }}" class="form-control d-inline-block w-auto">
+    <input type="number" name="num" min="1" max="{{ total_records }}" value="{{ num_values }}" class="form-control d-inline-block w-auto">
+
+    <label for="sort">Sort:</label>
+    <select name="sort" class="form-select d-inline-block w-auto">
+        <option value="desc" {% if sort=='desc' %}selected{% endif %}>Newest first</option>
+        <option value="asc" {% if sort=='asc' %}selected{% endif %}>Oldest first</option>
+    </select>
+
     <button type="submit" class="btn btn-primary ms-2">Apply</button>
 </form>
 
+
 <!-- ROW: graph and table -->
 <div class="row">
-    <p class="text-muted text-center">Graph data: {{ data|length }} entries</p>
-
     <!-- graph -->
     <div class="col-md-6" style="height: 350px;">
-    <canvas id="tempChart"></canvas>
-</div>
+        <canvas id="tempChart"></canvas>
+    </div>
 
     <!-- table -->
     <div class="col-md-6">
@@ -41,7 +47,7 @@
                 {% for entry in data %}
                 <tr>
                     <td>{{ entry.id + 1 }}</td>
-                    <td>{{ entry.temperature }}Degrees</td>
+                    <td>{{ entry.temperature }} Degrees</td>
                     <td>{{ entry.timestamp }}</td>
                 </tr>
                 {% endfor %}
