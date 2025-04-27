@@ -4,10 +4,14 @@ from flask_login import UserMixin
 
 db = SQLAlchemy()
 
+from datetime import datetime
+
 class Data(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     temperature = db.Column(db.Float, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp_measurement = db.Column(db.DateTime, nullable=False)
+    timestamp_send = db.Column(db.DateTime, nullable=False)
+    timestamp_received = db.Column(db.DateTime, default=datetime.utcnow)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)

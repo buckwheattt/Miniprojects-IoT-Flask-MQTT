@@ -1,0 +1,55 @@
+import network
+import time
+import machine
+import json
+from umqtt.simple import MQTTClient
+import random
+
+# Wi-Fi
+WIFI_SSID = 'drakkonok'
+WIFI_PASSWORD = 'qwertyuiop'
+
+# MQTT
+MQTT_BROKER = 'broker.hivemq.com'
+MQTT_PORT = 1883
+MQTT_TOPIC = 'temperature/room1'
+
+#Wi-Fi
+def connect_to_wifi():
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    wlan.connect(WIFI_SSID, WIFI_PASSWORD)
+
+    while not wlan.isconnected():
+        print('waiting for wifi')
+        time.sleep(1)
+
+    print('connected! IP:', wlan.ifconfig())
+
+#Wi-Fi
+connect_to_wifi()
+
+#MQTT
+client_id = "pico_" + str(machine.unique_id())
+client = MQTTClient(client_id, MQTT_BROKER, port=MQTT_PORT)
+client.connect()
+print('connedted to MQTT!')
+
+
+while True:
+    temperature = round(random.uniform(20, 30), 1)
+    timestamp_measurement = time.time()
+    timestamp_send = time.time()
+
+    payload = {
+        "temperature": temperature,
+        "timestamp_measurement": timestamp_measurement,
+        "timestamp_send": timestamp_send
+    }
+
+    json_payload = json.dumps(payload)
+
+    client.publish(MQTT_TOPIC, json_payload, qos=1)
+    print(f'sent!!: {json_payload}')
+
+    time.sleep(10)

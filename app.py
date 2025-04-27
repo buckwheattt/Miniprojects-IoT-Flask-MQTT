@@ -43,7 +43,7 @@ def dashboard():
     session["num"] = num_values
     session["sort"] = sort
 
-    order = Data.timestamp.desc() if sort == "desc" else Data.timestamp.asc()
+    order = Data.timestamp_measurement.desc() if sort == "desc" else Data.timestamp_measurement.asc()
     data = Data.query.order_by(order).limit(num_values).all()
     last_value = data[-1] if sort == "asc" else data[0] if data else None
 
@@ -57,7 +57,7 @@ def dashboard():
 @app.route("/delete_oldest", methods=["POST"])
 @login_required
 def delete_oldest():
-    oldest = Data.query.order_by(Data.timestamp.asc()).first()
+    oldest = Data.query.order_by(Data.timestamp_measurement.asc()).first()
     if oldest:
         db.session.delete(oldest)
         db.session.commit()

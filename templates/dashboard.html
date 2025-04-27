@@ -40,18 +40,24 @@
                 <tr>
                     <th>ID</th>
                     <th>Temperature</th>
-                    <th>Time</th>
+                    <th>Measured at</th>
+                    <th>Sent at</th>
+                    <th>Received at</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for entry in data %}
                 <tr>
-                    <td>{{ entry.id + 1 }}</td>
-                    <td>{{ entry.temperature }} Degrees</td>
-                    <td>{{ entry.timestamp }}</td>
+                    <td>{{ entry.id }}</td>
+                    <td>{{ entry.temperature }} C</td>
+                    <td>{{ entry.timestamp_measurement.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ entry.timestamp_send.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ entry.timestamp_received.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
+
         </table>
     </div>
 </div>
@@ -73,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: {{ data|map(attribute='timestamp')|list|tojson }},
+            labels: {{ data|map(attribute ='timestamp_measurement')|list|tojson }},
             datasets: [{
                 label: 'Temperature',
                 data: {{ data|map(attribute='temperature')|list|tojson }},
