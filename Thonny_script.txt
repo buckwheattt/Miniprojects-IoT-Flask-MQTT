@@ -2,54 +2,122 @@ import network
 import time
 import machine
 import json
-from umqtt.simple import MQTTClient
 import random
+import ubinascii
 
-# Wi-Fi
+from umqtt.simple import MQTTClient
+
 WIFI_SSID = 'drakkonok'
 WIFI_PASSWORD = 'qwertyuiop'
 
-# MQTT
 MQTT_BROKER = 'broker.hivemq.com'
 MQTT_PORT = 1883
-MQTT_TOPIC = 'temperature/room1'
+CLIENT_ID = "pico_" + ubinascii.hexlify(machine.unique_id()).decode()
 
-#Wi-Fi
+
+TOPIC_TEMPERATURE = b'pico/temperature'
+TOPIC_LED = b'pico/control/led'
+TOPIC_MEASURE = b'pico/control/measure'
+TOPIC_INTERVAL = b'pico/control/interval'
+
+led = machine.Pin("LED", machine.Pin.OUT)
+measuring = True
+interval = 10
+
 def connect_to_wifi():
+    import network
+    import time
+
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
+    time.sleep(2)
+    
+
     wlan.connect(WIFI_SSID, WIFI_PASSWORD)
 
-    while not wlan.isconnected():
-        print('waiting for wifi')
+    max_wait = 15
+    wait_count = 0
+
+    print("connecting to Wi-Fi...")
+
+    while wlan.status() != 3 and wait_count < max_wait:
+        status = wlan.status()
+        print(f"waiting for connection..status: {status}")
+        wait_count += 1
         time.sleep(1)
 
-    print('connected! IP:', wlan.ifconfig())
-
-#Wi-Fi
-connect_to_wifi()
-
-#MQTT
-client_id = "pico_" + str(machine.unique_id())
-client = MQTTClient(client_id, MQTT_BROKER, port=MQTT_PORT)
-client.connect()
-print('connedted to MQTT!')
+    if wlan.status() == 3:
+        print("Wi-Fi connected!")
+        print("IP-address:", wlan.ifconfig()[0])
+    else:
+        print("error connecting to Wi-Fi.")
+        print("status:", wlan.status())
+        raise RuntimeError("Wi-Fi connection failed")
 
 
-while True:
-    temperature = round(random.uniform(20, 30), 1)
-    timestamp_measurement = time.time()
-    timestamp_send = time.time()
+def mqtt_callback(topic, msg):
+    global measuring, interval
+    print("!!!command recieved:", topic, msg)
 
-    payload = {
-        "temperature": temperature,
-        "timestamp_measurement": timestamp_measurement,
-        "timestamp_send": timestamp_send
-    }
+    if topic == TOPIC_LED:
+        if msg == b'ON':
+            led.value(1)
+            print("LED ON")
+        elif msg == b'OFF':
+            led.value(0)
+            print("LED OFF")
 
-    json_payload = json.dumps(payload)
+    elif topic == TOPIC_MEASURE:
+        if msg == b'START':
+            measuring = True
+            print("started measuring...")
+        elif msg == b'STOP':
+            measuring = False
+            print("stopped measuring...")
 
-    client.publish(MQTT_TOPIC, json_payload, qos=1)
-    print(f'sent!!: {json_payload}')
+    elif topic == TOPIC_INTERVAL:
+        try:
+            new_interval = int(msg)
+            if new_interval > 0:
+                interval = new_interval
+                print(f"new interval: {interval} seconds")
+        except:
+            print("wrong interval")
 
-    time.sleep(10)
+
+def main():
+    connect_to_wifi()
+
+    client = MQTTClient(CLIENT_ID, MQTT_BROKER, port=MQTT_PORT)
+    client.set_callback(mqtt_callback)
+    client.connect()
+    client.subscribe(TOPIC_LED)
+    client.subscribe(TOPIC_MEASURE)
+    client.subscribe(TOPIC_INTERVAL)
+
+    print("connected to MQTT and subscribed to topics!")
+
+    while True:
+        client.check_msg()
+
+        if measuring:
+            temperature = round(random.uniform(20, 30), 1)
+            ts_measure = time.time()
+            ts_send = time.time()
+
+            payload = {
+                "temperature": temperature,
+                "timestamp_measurement": ts_measure,
+                "timestamp_send": ts_send
+            }
+
+            json_payload = json.dumps(payload)
+            client.publish(TOPIC_TEMPERATURE, json_payload, qos=1)
+            print("sent:", json_payload)
+
+            time.sleep(interval)
+        else:
+            time.sleep(0.5)
+
+
+main()

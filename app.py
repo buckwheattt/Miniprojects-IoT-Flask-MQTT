@@ -5,6 +5,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Data
 from api_routes import api_bp
 from datetime import datetime
+import paho.mqtt.publish as publish
+MQTT_BROKER = "broker.hivemq.com"  # или свой адрес брокера
+
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
@@ -97,6 +100,34 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for("login"))
+
+@app.route('/led/on', methods=['POST'])
+def led_on():
+    print("publish is:", publish)
+    publish.single("pico/control/led", "ON", hostname=MQTT_BROKER)
+    return redirect(url_for('dashboard'))
+
+@app.route('/led/off', methods=['POST'])
+def led_off():
+    publish.single("pico/control/led", "OFF", hostname=MQTT_BROKER)
+    return redirect(url_for('dashboard'))
+
+@app.route('/measure/start', methods=['POST'])
+def measure_start():
+    publish.single("pico/control/measure", "START", hostname=MQTT_BROKER)
+    return redirect(url_for('dashboard'))
+
+@app.route('/measure/stop', methods=['POST'])
+def measure_stop():
+    publish.single("pico/control/measure", "STOP", hostname=MQTT_BROKER)
+    return redirect(url_for('dashboard'))
+
+@app.route('/set_interval', methods=['POST'])
+def set_interval():
+    interval = request.form.get('interval')
+    if interval and interval.isdigit() and int(interval) > 0:
+        publish.single("pico/control/interval", interval, hostname=MQTT_BROKER)
+    return redirect(url_for('dashboard'))
 
 # ============ START ============
 if __name__ == "__main__":

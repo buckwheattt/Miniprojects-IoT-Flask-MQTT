@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import json
+import traceback
 from datetime import datetime
 import paho.mqtt.client as mqtt
-from app import db, Data, app  # импортируем из твоего Flask-приложения
+from app import app, db
+from models import Data # импортируем из твоего Flask-приложения
 
 # MQTT настройки
 MQTT_BROKER = 'broker.hivemq.com'
-MQTT_TOPIC = 'temperature/room1'
+MQTT_TOPIC = 'pico/temperature'
 
 def on_connect(client, userdata, flags, rc):
     print('MQTT connected with code', rc)
@@ -36,7 +38,8 @@ def on_message(client, userdata, msg):
         
         print('data has been written to db')
     except Exception as e:
-        print('error', e)
+        print("Exception while handling message:")
+        traceback.print_exc()
 
 client = mqtt.Client()
 client.on_connect = on_connect

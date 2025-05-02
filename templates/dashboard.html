@@ -18,12 +18,40 @@
 
     <label for="sort">Sort:</label>
     <select name="sort" class="form-select d-inline-block w-auto">
-        <option value="desc" {% if sort=='desc' %}selected{% endif %}>Newest first</option>
-        <option value="asc" {% if sort=='asc' %}selected{% endif %}>Oldest first</option>
+        <option value="desc" {% if sort == 'desc' %}selected{% endif %}>Newest first</option>
+        <option value="asc" {% if sort == 'asc' %}selected{% endif %}>Oldest first</option>
     </select>
 
     <button type="submit" class="btn btn-primary ms-2">Apply</button>
 </form>
+
+<!-- Control panel -->
+<div class="text-center mt-5 mb-5 pb-3">
+    <h4>Control Panel</h4>
+
+    <!-- LED -->
+    <form action="{{ url_for('led_on') }}" method="post" class="d-inline-block">
+        <button type="submit" class="btn btn-success">LED ON</button>
+    </form>
+    <form action="{{ url_for('led_off') }}" method="post" class="d-inline-block">
+        <button type="submit" class="btn btn-danger">LED OFF</button>
+    </form>
+
+    <!-- Measurement -->
+    <form action="{{ url_for('measure_start') }}" method="post" class="d-inline-block ms-3">
+        <button type="submit" class="btn btn-primary">Start Measurement</button>
+    </form>
+    <form action="{{ url_for('measure_stop') }}" method="post" class="d-inline-block">
+        <button type="submit" class="btn btn-warning">Stop Measurement</button>
+    </form>
+
+    <!-- Interval -->
+    <form action="{{ url_for('set_interval') }}" method="post" class="mt-3">
+        <label for="interval">Interval (s):</label>
+        <input type="number" name="interval" class="form-control d-inline-block w-auto mx-2" min="1" required>
+        <button type="submit" class="btn btn-info">Set Interval</button>
+    </form>
+</div>
 
 
 <!-- ROW: graph and table -->
@@ -68,6 +96,7 @@
         <button type="submit" class="btn btn-danger px-4 py-2">Delete oldest record</button>
     </form>
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
