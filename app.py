@@ -195,6 +195,7 @@ def set_interval():
 # ============ START ============
 
 if __name__ == "__main__":
-    app.run(ssl_context=('cert.pem', 'key.pem'))
+    app.run(host="0.0.0.0", port=5000, ssl_context=('cert.pem', 'key.pem'))
+
 
 
