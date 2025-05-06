@@ -6,11 +6,39 @@ from models import db, User, Data
 from api_routes import api_bp
 from datetime import datetime
 import paho.mqtt.publish as publish
+import logging
+from logging.handlers import RotatingFileHandler
+import time
+import socket
+from sqlalchemy import text
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
 MQTT_BROKER = "broker.hivemq.com"  # или свой адрес брокера
 
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
+
+# Логирование в файл
+app.logger.setLevel(logging.DEBUG)
+
+handler = RotatingFileHandler("app.log", maxBytes=1000000, backupCount=3)
+handler.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter(
+    "[%(asctime)s] %(levelname)s in %(module)s: %(message)s"
+)
+handler.setFormatter(formatter)
+app.logger.addHandler(handler)
+
+
+
+start_time = time.time()
+request_counter = 0
+
+limiter = Limiter(get_remote_address, app=app, default_limits=[])
+
 
 # Настройка базы данных
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
@@ -34,7 +62,42 @@ with app.app_context():
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+@app.before_request
+def log_and_count_requests():
+    global request_counter
+    request_counter += 1
+    app.logger.info(f"{request.method} {request.path} - from {request.remote_addr}")
+
+@app.after_request
+def log_response_info(response):
+    app.logger.info(f"{request.method} {request.path} {response.status_code}")
+    return response
+
+
+
 # ============ ROUTES ============
+
+@app.route('/health')
+def health():
+    uptime = round(time.time() - start_time)
+    db_ok = True
+    try:
+        db.session.execute(text("SELECT 1"))
+    except Exception:
+        db_ok = False
+
+    mqtt_ok = True
+    try:
+        socket.create_connection(("broker.hivemq.com", 1883), timeout=2)
+    except:
+        mqtt_ok = False
+
+    return jsonify({
+        "uptime_seconds": uptime,
+        "request_count": request_counter,
+        "database_ok": db_ok,
+        "mqtt_broker_ok": mqtt_ok
+    })
 
 @app.route("/")
 @login_required
@@ -130,5 +193,8 @@ def set_interval():
     return redirect(url_for('dashboard'))
 
 # ============ START ============
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(ssl_context=('cert.pem', 'key.pem'))
+
+

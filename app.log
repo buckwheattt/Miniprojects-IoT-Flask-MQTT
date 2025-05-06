@@ -1,0 +1,159 @@
+[2025-05-06 14:09:05,386] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 915, in full_dispatch_request
+    rv = self.preprocess_request()
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 1291, in preprocess_request
+    rv = self.ensure_sync(before_func)()
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\extension.py", line 1187, in _check_request_limit
+    raise e
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\extension.py", line 1163, in _check_request_limit
+    all_limits = self.__filter_limits(
+        endpoint,
+    ...<2 lines>...
+        in_middleware,
+    )
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\extension.py", line 1020, in __filter_limits
+    defaults, decorated = self.limit_manager.resolve_limits(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        flask.current_app,
+        ^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        marked_for_limiting,
+        ^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\manager.py", line 134, in resolve_limits
+    all_limits += self.default_limits
+                  ^^^^^^^^^^^^^^^^^^^
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\manager.py", line 40, in default_limits
+    return list(itertools.chain(*self._default_limits))
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\wrappers.py", line 179, in __iter__
+    limit_items = parse_many(limit_str) if limit_str else []
+                  ~~~~~~~~~~^^^^^^^^^^^
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\limits\util.py", line 168, in parse_many
+    raise ValueError(f"couldn't parse rate limit string '{limit_string}'")
+ValueError: couldn't parse rate limit string 'none'
+[2025-05-06 14:15:26,699] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 915, in full_dispatch_request
+    rv = self.preprocess_request()
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 1291, in preprocess_request
+    rv = self.ensure_sync(before_func)()
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\extension.py", line 1187, in _check_request_limit
+    raise e
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\extension.py", line 1163, in _check_request_limit
+    all_limits = self.__filter_limits(
+        endpoint,
+    ...<2 lines>...
+        in_middleware,
+    )
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\extension.py", line 1020, in __filter_limits
+    defaults, decorated = self.limit_manager.resolve_limits(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        flask.current_app,
+        ^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        marked_for_limiting,
+        ^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\manager.py", line 134, in resolve_limits
+    all_limits += self.default_limits
+                  ^^^^^^^^^^^^^^^^^^^
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\manager.py", line 40, in default_limits
+    return list(itertools.chain(*self._default_limits))
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\wrappers.py", line 179, in __iter__
+    limit_items = parse_many(limit_str) if limit_str else []
+                  ~~~~~~~~~~^^^^^^^^^^^
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\limits\util.py", line 168, in parse_many
+    raise ValueError(f"couldn't parse rate limit string '{limit_string}'")
+ValueError: couldn't parse rate limit string 'none'
+[2025-05-06 14:15:29,580] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 915, in full_dispatch_request
+    rv = self.preprocess_request()
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 1291, in preprocess_request
+    rv = self.ensure_sync(before_func)()
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\extension.py", line 1187, in _check_request_limit
+    raise e
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\extension.py", line 1163, in _check_request_limit
+    all_limits = self.__filter_limits(
+        endpoint,
+    ...<2 lines>...
+        in_middleware,
+    )
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\extension.py", line 1020, in __filter_limits
+    defaults, decorated = self.limit_manager.resolve_limits(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        flask.current_app,
+        ^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        marked_for_limiting,
+        ^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\manager.py", line 134, in resolve_limits
+    all_limits += self.default_limits
+                  ^^^^^^^^^^^^^^^^^^^
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\manager.py", line 40, in default_limits
+    return list(itertools.chain(*self._default_limits))
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\wrappers.py", line 179, in __iter__
+    limit_items = parse_many(limit_str) if limit_str else []
+                  ~~~~~~~~~~^^^^^^^^^^^
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\limits\util.py", line 168, in parse_many
+    raise ValueError(f"couldn't parse rate limit string '{limit_string}'")
+ValueError: couldn't parse rate limit string 'none'
+[2025-05-06 14:15:30,415] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 915, in full_dispatch_request
+    rv = self.preprocess_request()
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask\app.py", line 1291, in preprocess_request
+    rv = self.ensure_sync(before_func)()
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\extension.py", line 1187, in _check_request_limit
+    raise e
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\extension.py", line 1163, in _check_request_limit
+    all_limits = self.__filter_limits(
+        endpoint,
+    ...<2 lines>...
+        in_middleware,
+    )
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\extension.py", line 1020, in __filter_limits
+    defaults, decorated = self.limit_manager.resolve_limits(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        flask.current_app,
+        ^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        marked_for_limiting,
+        ^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\manager.py", line 134, in resolve_limits
+    all_limits += self.default_limits
+                  ^^^^^^^^^^^^^^^^^^^
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\manager.py", line 40, in default_limits
+    return list(itertools.chain(*self._default_limits))
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\flask_limiter\wrappers.py", line 179, in __iter__
+    limit_items = parse_many(limit_str) if limit_str else []
+                  ~~~~~~~~~~^^^^^^^^^^^
+  File "C:\CVUT\nsi\1stMiniproject\venv\Lib\site-packages\limits\util.py", line 168, in parse_many
+    raise ValueError(f"couldn't parse rate limit string '{limit_string}'")
+ValueError: couldn't parse rate limit string 'none'
+[2025-05-06 14:17:17,451] INFO in app: GET / - from 127.0.0.1
+[2025-05-06 14:19:32,394] INFO in app: GET / - from 127.0.0.1
+[2025-05-06 14:19:32,426] INFO in app: GET / 200
