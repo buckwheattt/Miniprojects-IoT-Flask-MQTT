@@ -15,25 +15,6 @@ This project demonstrates remote control using hand movement recognition. A moti
 -IMU (I2C): SDA → GP0, SCL → GP1  
 -RGB LED: R → GP15, G → GP14, B → GP13 (each via 220 Ω resistor), cathode → GND  
 
-## Repository Structure
-├── hw_testing/              # Hardware test scripts
-│   ├── imu_reading_test.py  # Check IMU output
-│   ├── led_test.py          # Test LED colors and PWM
-│   └── module_finding_test.py # Check I2C address
-│
-├── pico_scripts/            # Code running on Raspberry Pi Pico
-│   ├── mpu9250.py, mpu_6050.py  # IMU drivers
-│   ├── imu_stream.py        # Send IMU data to PC via UART
-│   └── main.py              # Final Pico script (IMU + LED control)
-│
-├── final_python_scripts/    # Code running on PC
-│   ├── log_data.py          # Collect labeled CSV gesture data
-│   └── run_inference.py     # Real-time inference, LED control
-│
-├── model.pkl                # Trained RandomForest model
-├── jupyter_skripty.py       # Data processing, feature extraction, training
-└── main_old.py              # Early prototype (no ML)
-
 ## Setup & Usage Steps  
  ### Hardware Setup  
  Connect IMU and LED to Pico as described.
